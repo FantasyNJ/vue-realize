@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui@1.4/lib/theme-default/index.css">
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui@1.4/lib/index.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div>
+            <div v-for="item in jobNumberRules">
+                    <!-- <el-checkbox 
+                        v-model="item.checkboxList[1].checked" 
+                        :disabled="item.checkboxList[1].disabled"
+                    >正式</el-checkbox>
+                    <el-checkbox 
+                        v-model="item.checkboxList[10].checked" 
+                        :disabled="item.checkboxList[10].disabled"
+                    >实习</el-checkbox>
+                    <el-checkbox 
+                        v-model="item.checkboxList[11].checked" 
+                        :disabled="item.checkboxList[11].disabled"
+                    >劳务</el-checkbox>
+                    <el-checkbox 
+                        v-model="item.checkboxList[12].checked" 
+                        :disabled="item.checkboxList[12].disabled"
+                    >顾问</el-checkbox>
+                    <el-checkbox 
+                        v-model="item.checkboxList[13].checked" 
+                        :disabled="item.checkboxList[13].disabled"
+                    >返聘</el-checkbox> -->
+                    <el-checkbox 
+                        v-for="(data,i) in item.checkboxList"
+                        v-model="data.checked" 
+                        :disabled="data.disabled"
+                        @change="change(data, i)"
+                    >
+                    {{ data.name }}
+                    </el-checkbox>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: function(){
+
+                return {
+                    "autoCreateSwitch": 1,
+                    "editSwitch": 0,
+                    "jobNumberRules": [
+                        {
+                            "prefix": "产品",
+                            "serialNumber": "00001",
+                            "hireType": [1, 10, 11],
+                            "checkboxList": [
+                                {
+                                    checked: true,
+                                    disabled: false,
+                                    name: '正式'
+                                },
+                                {
+                                    checked: true,
+                                    disabled: false,
+                                    name: '实习'
+                                },
+                                {
+                                    checked: true,
+                                    disabled: false,
+                                    name: '劳务'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '顾问'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '返聘'
+                                }
+                            ]
+                        },
+                        {
+                            "prefix": "产品",
+                            "serialNumber": "00001",
+                            "hireType": [1, 10, 11],
+                            "checkboxList": [
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '正式'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '实习'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '劳务'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '顾问'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '返聘'
+                                }
+                            ]
+                        },
+                        {
+                            "prefix": "产品",
+                            "serialNumber": "00001",
+                            "hireType": [1, 10, 11],
+                            "checkboxList": [
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '正式'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '实习'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '劳务'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '顾问'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '返聘'
+                                }
+                            ]
+                        },
+                        {
+                            "prefix": "产品",
+                            "serialNumber": "00001",
+                            "hireType": [1, 10, 11],
+                            "checkboxList": [
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '正式'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '实习'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '劳务'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '顾问'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '返聘'
+                                }
+                            ]
+                        },
+                        {
+                            "prefix": "产品",
+                            "serialNumber": "00001",
+                            "hireType": [1, 10, 11],
+                            "checkboxList": [
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '正式'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '实习'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '劳务'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '顾问'
+                                },
+                                {
+                                    checked: false,
+                                    disabled: false,
+                                    name: '返聘'
+                                }
+                            ]
+                        },
+                    ]
+                }
+            },
+            methods:{
+                change(data, index){
+                    let t = this;
+                    let arr = [];
+                    let len = t.jobNumberRules.length;
+
+                    t.jobNumberRules.forEach(function(item){
+                        arr.push(item.checkboxList[index]);
+                    })
+
+                    arr.forEach(function(item){
+                        item.disabled = false;
+                    })
+
+                    let disArr = arr.filter(function(item){
+                        return !item.checked
+                    })
+
+                    if(disArr.length !== len ){
+                        disArr.forEach(function(item){
+                            item.disabled = true;
+                        })
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
