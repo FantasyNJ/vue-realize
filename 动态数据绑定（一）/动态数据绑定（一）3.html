@@ -8,31 +8,51 @@
 </head>
 <body>
     <p>
-         请实现这样的一个 Observer，要求如下： 传入参数只考虑对象，不考虑数组。 
-         new Observer返回一个对象，其 data 属性要能够访问到传递进去的对象。 
-         通过 data 访问属性和设置属性的时候，均能打印出右侧对应的信息。
+        考虑传递回调函数。在实际应用中，当特定数据发生改变的时候，我们是希望做一些特定的事情的，而不是每一次都只能打印出一些信息。所以，我们需要支持传入回调函数的功能。举个例子。
     </p>
 
     <script>
         function Observer(obj){
             this.data = obj;
             this.walk(obj);
+            this.event = {}
         }
 
-        Observer.prototype.walk = function(obj){
-            var t = this;
-            for(var attr in obj){
-                var item = obj[attr];
-                if(typeof item === 'object'){
-                    t.walk(item);
-                }
-                // 不论对象还是简单类型的值都监听
-                t.convert(obj, attr)
+        var pt = Observer.prototype;
+
+        pt.$on = function (attr, fn) {
+            if( this.event[attr] ){
+                this.event[attr].push(fn);
+            }else{
+                this.event[attr] = [fn]
             }
         }
 
-        Observer.prototype.convert = function(obj, attr){
+        pt.$emit = function (attr, val) {
+            if(this.event[attr] && this.event.hasOwnProperty(attr) ){
+                this.event[attr].forEach( ( fn ) => {
+                    fn(val)
+                } )
+            }
+        }
+
+        pt.walk = function(obj, parent){
+            var t = this;
+            var parent = parent ? parent : '';
+            for(var attr in obj){
+                var item = obj[attr];
+                var path = parent ? parent + '.' + attr : attr;
+                if(typeof item === 'object'){
+                    t.walk(item, path);
+                }
+                // 不论对象还是简单类型的值都监听
+                t.convert(obj, attr, path)
+            }
+        }
+
+        pt.convert = function(obj, attr, path){
             var value = obj[attr];
+            var t = this;
             Object.defineProperty(obj, attr, {
                 enumerable: true,  // 当且仅当该属性的 enumerable 为 true 时，该属性才能够出现在对象的枚举属性中。默认为 false。
                 configurable: true,  // 当且仅当该属性的 configurable 为 true 时，该属性描述符才能够被改变，也能够被删除。默认为 false。
@@ -42,12 +62,16 @@
                 },
                 set(newVal) {
                     console.log(newVal)
-                    if (val !== newVal) {
-                        console.log(`你设置了${attr}，新的值为${val}`);
+                    if (value !== newVal) {
+                        t.$emit(path, newVal);
                         value = newVal
                     }
                 }
             })
+        }
+
+        pt.$watch = function (attr, fn) {
+            this.$on( attr, fn )
         }
 
         let app1 = new Observer({
@@ -60,6 +84,10 @@
                     xixi: 123456
                 }
             }
+        });
+
+        app1.$watch('age', function(age) {
+            console.log(`我的年纪变了，现在已经是：${age}岁了`)
         });
     </script>
 </body>

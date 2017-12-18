@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <p>
+        在上面的基础上，我们再多考虑一个问题："深层次数据变化如何逐层往上传播"
+    </p>
+
+    <script>
+        function Observer(obj){
+            this.data = obj;
+            this.walk(obj);
+            this.event = {}
+        }
+
+        var pt = Observer.prototype;
+
+        pt.$on = function (attr, fn) {
+            if( this.event[attr] ){
+                this.event[attr].push(fn);
+            }else{
+                this.event[attr] = [fn]
+            }
+        }
+
+        pt.$emit = function (attr, val) {
+            if(this.event[attr] && this.event.hasOwnProperty(attr) ){
+                var attrs = attr.split('.');
+                var flowAttr = []
+
+                attrs.forEach( (attr, index) => {
+                    flowAttr.unshift( attrs.slice(0, index+1).join('.') );
+                } )
+
+                console.log(attrs, flowAttr)
+
+                flowAttr.forEach( (attr) => {
+                    this.event[attr].forEach( ( fn ) => {
+                        fn(val)
+                    } )
+                } )
+            }
+        }
+
+        pt.walk = function(obj, parent){
+            var t = this;
+            var parent = parent ? parent : '';
+            for(var attr in obj){
+                var item = obj[attr];
+                var path = parent ? parent + '.' + attr : attr;
+                if(typeof item === 'object'){
+                    t.walk(item, path);
+                }
+                // 不论对象还是简单类型的值都监听
+                t.convert(obj, attr, path)
+            }
+        }
+
+        pt.convert = function(obj, attr, path){
+            var value = obj[attr];
+            var t = this;
+            Object.defineProperty(obj, attr, {
+                enumerable: true,  // 当且仅当该属性的 enumerable 为 true 时，该属性才能够出现在对象的枚举属性中。默认为 false。
+                configurable: true,  // 当且仅当该属性的 configurable 为 true 时，该属性描述符才能够被改变，也能够被删除。默认为 false。
+                get() {
+                    console.log(`你访问了${attr}`);
+                    return value
+                },
+                set(newVal) {
+                    console.log(newVal)
+                    if (value !== newVal) {
+                        t.$emit(path, newVal);
+                        value = newVal
+                    }
+                }
+            })
+        }
+
+        pt.$watch = function (attr, fn) {
+            this.$on( attr, fn )
+        }
+
+        let app1 = new Observer({
+            name: 'youngwind',
+            age: 25,
+            list: {
+                haha: 'oh',
+                lala: 'ff',
+                dist: {
+                    xixi: 123456
+                }
+            }
+        });
+
+        app1.$watch('list', function(age) {
+            console.log(`list变了`)
+        });
+
+        app1.$watch('list.haha', function(age) {
+            console.log(`list.haha变了,值为${age}`);
+        });
+    </script>
+</body>
+</html>
