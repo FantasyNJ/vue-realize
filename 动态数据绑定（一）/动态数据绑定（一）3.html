@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <p>
+         请实现这样的一个 Observer，要求如下： 传入参数只考虑对象，不考虑数组。 
+         new Observer返回一个对象，其 data 属性要能够访问到传递进去的对象。 
+         通过 data 访问属性和设置属性的时候，均能打印出右侧对应的信息。
+    </p>
+
+    <script>
+        function Observer(obj){
+            this.data = obj;
+            this.event = {};
+            this.walk(obj);
+        }
+
+        // 绑定事件
+        Observer.prototype.on = function( key, cb ){
+            if( this.event[key] ){
+                this.event[key].push( cb );
+            }else{
+                this.event[key] = [cb];
+            }
+        }
+
+        // 触发事件
+        Observer.prototype.emit = function( key ){
+            if( this.event[key] && this.event.hasOwnProperty(key) ){
+                this.event[key].forEach(function( fn ){
+                    fn();
+                })
+            }
+        }
+
+        Observer.prototype.walk = function(obj){
+            var t = this;
+            for(var attr in obj){
+                var item = obj[attr];
+                if(typeof item === 'object'){
+                    t.walk(item);
+                }
+                // 不论对象还是简单类型的值都监听
+                t.convert(obj, attr)
+            }
+        }
+
+        Observer.prototype.convert = function(obj, attr){
+            var t = this;
+            var value = obj[attr];
+            Object.defineProperty(obj, attr, {
+                enumerable: true,  // 当且仅当该属性的 enumerable 为 true 时，该属性才能够出现在对象的枚举属性中。默认为 false。
+                configurable: true,  // 当且仅当该属性的 configurable 为 true 时，该属性描述符才能够被改变，也能够被删除。默认为 false。
+                get() {
+                    console.log(`你访问了${attr}`);
+                    return value
+                },
+                set(val, oldVal) {
+                    console.log(val, oldVal)
+                    if (val !== oldVal) {
+                        console.log(`你设置了${attr}，新的值为${val}`);
+                        value = val
+                        // 不论对象还是简单类型的值都监听
+                        console.log(obj, attr, '监听')
+                        t.walk(obj)
+                    }
+                }
+            })
+        }
+
+        let app1 = new Observer({
+            name: 'youngwind',
+            age: 25,
+            list: {
+                haha: 'oh',
+                lala: 'ff',
+                dist: {
+                    xixi: 123456
+                }
+            }
+        });
+    </script>
+</body>
+</html>
