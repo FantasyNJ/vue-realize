@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@1.4/lib/theme-default/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui@1.4/lib/index.js"></script>
+    <style>
+        body{
+            padding-top: 800px;
+        }
+        .xixi{
+            width: 300px;
+            height: 300px;
+            background: red;
+            overflow: auto;
+        }
+        .haha{
+            width: 200px;
+            height: 900px;
+            background: rgb(5, 5, 7);
+        }
+
+        .sel{
+            margin-top: 600px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="xixi">
+        <div class="haha">
+            <el-select class="sel" v-model="value" multiple :multiple-limit="5" placeholder="请选择">
+                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+            </el-select>
+        </div>
+    </div>
+
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+    <div style="width: 100px;height: 100px;background: red" @mouseup.stop="haha"></div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: function(){
+            return {
+                options: [{
+                    value: '选项1',
+                    label: '黄金糕'
+                }, {
+                    value: '选项2',
+                    label: '双皮奶'
+                }
+                , {
+                    value: '选项3',
+                    label: '蚵仔煎'
+                }, {
+                    value: '选项4',
+                    label: '龙须面'
+                }, {
+                    value: '选项5',
+                    label: '北京烤鸭'
+                },
+                {
+                        value: '选项6',
+                        label: '黄金糕'
+                    }, {
+                        value: '选项7',
+                        label: '双皮奶'
+                    }, {
+                        value: '选项8',
+                        label: '蚵仔煎'
+                    }, {
+                        value: '选项9',
+                        label: '龙须面'
+                    }, {
+                        value: '选项0',
+                        label: '北京烤鸭'
+                    }
+                    ],
+                value: ''
+            }
+        },
+        watch: {
+            value(v){
+                console.log(v)
+            }
+        }
+    })
+</script>
+</body>
+</html>

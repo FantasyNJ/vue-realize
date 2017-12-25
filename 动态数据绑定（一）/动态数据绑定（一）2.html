@@ -40,11 +40,11 @@
                     console.log(`你访问了${attr}`);
                     return value
                 },
-                set(val, oldVal) {
-                    console.log(val, oldVal)
-                    if (val !== oldVal) {
+                set(newVal) {
+                    console.log(newVal)
+                    if (val !== newVal) {
                         console.log(`你设置了${attr}，新的值为${val}`);
-                        value = val
+                        value = newVal
                     }
                 }
             })

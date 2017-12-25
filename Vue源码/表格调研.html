@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@1.4/lib/theme-default/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui@1.4/lib/index.js"></script>
+    <style>
+        .demo-table-expand {
+            font-size: 0;
+        }
+        .demo-table-expand label {
+            width: 90px;
+            color: #99a9bf;
+        }
+        .demo-table-expand .el-form-item {
+            margin-right: 0;
+            margin-bottom: 0;
+            width: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <el-table 
+        :data="tableData" 
+        border 
+        style="width: 100%" 
+        :default-sort="{prop: 'date', order: 'descending'}"
+        @header-dragend="haha"
+        >
+            <el-table-column prop="date" label="日期" sortable min-width="100px">
+            </el-table-column>
+            <el-table-column prop="name" label="姓名" sortable min-width="100px">
+            </el-table-column>
+            <el-table-column prop="address" label="地址" width="100px">
+            </el-table-column>
+        </el-table>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: function () {
+                return {
+                    tableData: [{
+                        date: '2016-05-02',
+                        name: '王小虎',
+                        address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                        date: '2016-05-04',
+                        name: '王小虎',
+                        address: '上海市普陀区金沙江路 1517 弄'
+                    }, {
+                        date: '2016-05-01',
+                        name: '王小虎',
+                        address: '上海市普陀区金沙江路 1519 弄'
+                    }, {
+                        date: '2016-05-03',
+                        name: '王小虎',
+                        address: '上海市普陀区金沙江路 1516 弄'
+                    }]
+                }
+            },
+            methods: {
+                haha(newWidth, oldWidth, column, event) {
+                    console.log(newWidth, oldWidth, column, event)
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
