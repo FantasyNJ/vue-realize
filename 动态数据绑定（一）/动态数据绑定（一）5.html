@@ -14,19 +14,18 @@
     <div id="app">
         <p>姓名：{{ name }}</p>
         <p>年龄：{{ age }}</p>
-        <p>xixi: {{ list.data.xixi }}</p>
+        <p>xixi: {{ list.dist.xixi }}</p>
     </div>
 
     <script>
         function Observer(obj){
-            this.data = obj;
-            this.walk(obj);
+            this.data = obj.data;
+            this.walk(this.data);
             this.event = {};
             this.elem = obj.el;
             this.$el = document.querySelector(this.elem);
             // 克隆数据节点，防止渲染之后节点中没有绑定的data信息
             this.templateClone = this.$el.cloneNode(true);
-            console.log(this.templateClone, 'templateClone')
             // 渲染数据
             this.renderData();
         }
@@ -35,15 +34,11 @@
 
         // 渲染数据
         pt.renderData = function(){
-            debugger;
             var template = this.templateClone.cloneNode(true);
-            console.log(template, 'template11111')
             // var fragment = document.createDocumentFragment();
 
             // 替换数据
             var fragment = this.walkDom( template );
-
-            console.dir( fragment, 'fragment' )
 
             this.$el.parentNode.replaceChild( fragment, this.$el );
             this.$el = document.querySelector(this.elem);
@@ -51,14 +46,14 @@
 
         pt.walkDom = function(template){
             var t = this;
-            console.log(template, 'template')
             var childNodes = template.childNodes;
             var fragment = document.createDocumentFragment();
 
-            for(var i = 0; i < childNodes.length; i++){
+            var i = 0;
+            while( childNodes.length > 0 ){
+            console.log(childNodes.length, 'length')
+            // for( var i = 0; i < childNodes.length; i++ ){  // 删除元素了
                 var dom = childNodes[i];
-
-                console.log(dom, dom.nodeType)
 
                 // 元素类型，继续循环
                 if(dom.nodeType === 1){
@@ -72,8 +67,9 @@
                         var attrs = $1.trim().split('.');
                         var data = t.data;
 
-                        for(var i = 0; i < attrs.length; i++){
-                            data = data[attrs[i]];
+                        for(var j = 0; j < attrs.length; j++){
+                            data = data[attrs[j]];
+                            console.log(data, 'data');
                         }
 
                         return data;
@@ -106,8 +102,6 @@
                 attrs.forEach( (attr, index) => {
                     flowAttr.unshift( attrs.slice(0, index+1).join('.') );
                 } )
-
-                console.log(attrs, flowAttr)
 
                 flowAttr.forEach( (attr) => {
                     this.event[attr].forEach( ( fn ) => {
