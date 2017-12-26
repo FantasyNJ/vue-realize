@@ -4,7 +4,7 @@
 
 
 3种定义对象属性的方法
-```
+```javascript
 // (1) define someOne property name
 someOne.name = 'cover';
 //or use (2) 
@@ -38,7 +38,7 @@ Object.defineProperty(obj, prop, descriptor)
 ### value
 属性对应的值,可以使任意类型的值，默认为undefined
 
-```
+```javascript
 var obj = {}
 //第一种情况：不设置value属性
 Object.defineProperty(obj,"newKey",{
@@ -57,7 +57,7 @@ console.log( obj.newKey );  //hello
 
 属性的值是否可以被重写。设置为true可以被重写；设置为false，不能被重写。默认为false。
 
-```
+```javascript
 var obj = {}
 //第一种情况：writable设置为false，不能重写。
 Object.defineProperty(obj,"newKey",{
@@ -82,7 +82,7 @@ console.log( obj.newKey );  //change value
 
 此属性是否可以被枚举（使用for...in或Object.keys()）。设置为true可以被枚举；设置为false，不能被枚举。默认为false。
 
-```
+```javascript
 var obj = {}
 //第一种情况：enumerable设置为false，不能被枚举。
 Object.defineProperty(obj,"newKey",{
@@ -117,7 +117,7 @@ for( var attr in obj ){
 1. 目标属性是否可以使用delete删除
 2. 目标属性是否可以再次设置特性
 
-```
+```javascript
 //-----------------测试目标属性是否能被删除------------------------
 var obj = {}
 //第一种情况：configurable设置为false，不能被删除。
@@ -181,7 +181,7 @@ console.log( obj.newKey ); //hello
 
 除了可以给新定义的属性设置特性，也可以给已有的属性设置特性（非Object.defineProperty定义的）
 
-```
+```javascript
 //定义对象的时候添加的属性，是可删除、可重写、可枚举的。
 var obj = {
     test:"hello"
@@ -205,7 +205,7 @@ console.log( obj.test ); //依然是：'change value'
 
 提示：一旦使用Object.defineProperty给对象添加属性，那么如果不设置属性的特性，那么configurable、enumerable、writable这些值都为默认的false
 
-```
+```javascript
 var obj = {};
 //定义的新属性后，这个属性的特性中configurable，enumerable，writable都为默认的值false
 //这就导致了neykey这个是不能重写、不能枚举、不能再次设置特性
@@ -226,7 +226,7 @@ for( var attr in obj ){
 
 **注意 在调用Object.defineProperty()方法时，如果不指定， configurable， enumerable， writable特性的默认值都是false,这跟之前所 说的对于像前面例子中直接在对象上定义的属性，这个特性默认值为为 true。并不冲突，如下代码所示：**
 
-```
+```javascript
 //调用Object.defineProperty()方法时，如果不指定
 var someOne = { };
 someOne.name = 'coverguo';
@@ -253,7 +253,7 @@ console.log(Object.getOwnPropertyDescriptor(otherOne, 'name'));
 
 当使用存取器描述属性的特性的时候，允许设置以下特性属性：
 
-```
+```javascript
 var obj = {};
 Object.defineProperty(obj,"newKey",{
     get:function (){} | undefined,
@@ -274,7 +274,7 @@ Object.defineProperty(obj,"newKey",{
 
 在特性中使用get/set属性来定义对应的方法。
 
-```
+```javascript
 var obj = {};
 var initValue = 'hello';
 Object.defineProperty(obj,"newKey",{
@@ -298,7 +298,7 @@ console.log( obj.newKey ); //change value
 
 使用set更改属性的值时，其实对象属性的值并没有发生修改，只有在访问这个属性的时候才被修改
 
-```
+```javascript
 var obj = {};
     var initValue = 'hello';
     Object.defineProperty(obj,"newKey",{
@@ -337,7 +337,7 @@ var obj = {};
 在一些框架，如vue、express、avalon.js
 
 ### 增加属性获取和修改时的信息
-```
+```javascript
 [
   'json',
   'urlencoded',
