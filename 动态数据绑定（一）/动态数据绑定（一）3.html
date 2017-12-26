@@ -94,8 +94,8 @@
             }
         });
 
-        app1.$watch('age', function(age) {
-            console.log(`我的年纪变了，现在已经是：${age}岁了`)
+        app1.$watch('age', function (age, oldAge) {
+            console.log(`我的年纪变了，现在已经是：${age}岁了，原来的年龄是${oldAge}岁。`)
         });
     </script>
 </body>
