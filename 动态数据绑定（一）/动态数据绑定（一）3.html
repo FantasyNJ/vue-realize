@@ -32,10 +32,10 @@
             }
         }
 
-        pt.$emit = function (attr, val) {
+        pt.$emit = function (attr, newVal, oldVal) {
             if(this.event[attr] && this.event.hasOwnProperty(attr) ){
                 this.event[attr].forEach( ( fn ) => {
-                    fn(val)
+                    fn(newVal, oldVal)
                 } )
             }
         }
@@ -67,7 +67,10 @@
                 set(newVal) {
                     console.log(newVal)
                     if (value !== newVal) {
-                        t.$emit(path, newVal);
+                        t.$emit(path, newVal, value);
+                        if( typeof newVal === 'object' ){
+                            t.walk( newVal, path );
+                        }
                         value = newVal
                     }
                 }

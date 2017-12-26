@@ -139,7 +139,12 @@
                     console.log(newVal)
                     if (value !== newVal) {
                         t.$emit(path, newVal);
-                        value = newVal
+
+                        if (typeof newVal === 'object') {
+                            t.walk(newVal, path);
+                        }
+
+                        value = newVal;
 
                         t.renderData();
                     }

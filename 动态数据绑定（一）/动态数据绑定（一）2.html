@@ -44,6 +44,9 @@
                     console.log(newVal)
                     if (val !== newVal) {
                         console.log(`你设置了${attr}，新的值为${val}`);
+                        if (typeof newVal === 'object') {
+                            t.walk(newVal, path);
+                        }
                         value = newVal
                     }
                 }
