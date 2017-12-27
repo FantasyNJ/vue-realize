@@ -65,7 +65,7 @@ pt.$on = function (attr, fn) {
 }
 // 事件触发 类似jq中的trigger
 pt.$emit = function (attr, newVal, oldVal) {
-    // 如果该属性已经绑定事件并且该属性是event对象的自有属性（飞原型链属性，按照绑定顺序依次处罚）
+    // 如果该属性已经绑定事件并且该属性是event对象的自有属性（此处可不用hasOwnProperty）
     if(this.event[attr] && this.event.hasOwnProperty(attr) ){
         this.event[attr].forEach( ( fn ) => {
             fn(newVal, oldVal)
