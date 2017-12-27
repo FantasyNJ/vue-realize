@@ -351,6 +351,7 @@ var obj = {};
 
 ### 增加属性获取和修改时的信息
 ```javascript
+var exports = {};
 [
   'json',
   'urlencoded',
