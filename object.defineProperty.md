@@ -5,6 +5,7 @@
 
 3种定义对象属性的方法
 ```javascript
+var someOne = {};
 // (1) define someOne property name
 someOne.name = 'cover';
 //or use (2) 
@@ -201,9 +202,19 @@ Object.defineProperty(obj,"test",{
 obj.test = 'change value again';
 
 console.log( obj.test ); //依然是：'change value'
+
+// 试一下是否可以删除
+delete obj.test;
+
+console.log( obj )  // {}
+
+// 竟然可以删除掉，看一下defineProperty的值，只覆盖defineProperty中设置的属性
+console.log( Object.getOwnPropertyDescriptor(obj, 'test') );
+// 输出 {value: "change value", writable: false, enumerable: true, configurable: true}
+
 ```
 
-提示：一旦使用Object.defineProperty给对象添加属性，那么如果不设置属性的特性，那么configurable、enumerable、writable这些值都为默认的false
+提示：一旦使用Object.defineProperty给对象添加属性（新增），那么如果不设置属性的特性，那么configurable、enumerable、writable这些值都为默认的false。**如果之前不是使用defineProperty设置的属性，再次使用defineProperty修改属性时只覆盖defineProperty中设置的属性（详细见上方例子）**
 
 ```javascript
 var obj = {};
