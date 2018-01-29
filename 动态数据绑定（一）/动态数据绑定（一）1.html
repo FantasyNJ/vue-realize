@@ -1,41 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
     <p>
-         请实现这样的一个 Observer，要求如下： 传入参数只考虑对象，不考虑数组。 
-         new Observer返回一个对象，其 data 属性要能够访问到传递进去的对象。 
-         通过 data 访问属性和设置属性的时候，均能打印出右侧对应的信息。
+        请实现这样的一个 Observer，要求如下： 传入参数只考虑对象，不考虑数组。 new Observer返回一个对象，其 data 属性要能够访问到传递进去的对象。 通过 data 访问属性和设置属性的时候，均能打印出右侧对应的信息。
     </p>
 
     <script>
-        function Observer(obj){
+        function Observer(obj) {
             this.data = obj;
             this.walk(obj);
         }
 
-        Observer.prototype.walk = function(obj){
+        Observer.prototype.walk = function(obj) {
             var t = this;
-            for(var attr in obj){
+            for (var attr in obj) {
                 var item = obj[attr];
-                if(typeof item === 'object'){
+                if (typeof item === 'object') {
                     t.walk(item);
-                }else{  // 检测不到key为对象的属性
-                    t.convert(obj, attr)
                 }
+                // 检测不到key为对象的属性
+                t.convert(obj, attr)
+
             }
         }
 
-        Observer.prototype.convert = function(obj, attr){
+        Observer.prototype.convert = function(obj, attr) {
             var value = obj[attr];
             Object.defineProperty(obj, attr, {
-                enumerable: true,  // 当且仅当该属性的 enumerable 为 true 时，该属性才能够出现在对象的枚举属性中。默认为 false。
-                configurable: true,  // 当且仅当该属性的 configurable 为 true 时，该属性描述符才能够被改变，也能够被删除。默认为 false。
+                enumerable: true, // 当且仅当该属性的 enumerable 为 true 时，该属性才能够出现在对象的枚举属性中。默认为 false。
+                configurable: true, // 当且仅当该属性的 configurable 为 true 时，该属性描述符才能够被改变，也能够被删除。默认为 false。
                 get() {
                     console.log(`你访问了${attr}`);
                     return value
@@ -44,20 +45,21 @@
                     console.log(newval)
                     if (newval !== value) {
                         console.log(`你设置了${attr}，新的值为${newval}`);
-                        value = val
+                        value = newval
                     }
                 }
             })
         }
 
         let app1 = new Observer({
-                name: 'youngwind',
-                age: 25,
-                list: {
-                    haha: 'oh',
-                    lala: 'ff'
-                }
-            });
+            name: 'youngwind',
+            age: 25,
+            list: {
+                haha: 'oh',
+                lala: 'ff'
+            }
+        });
     </script>
 </body>
+
 </html>

@@ -29,6 +29,110 @@ Object.defineProperty属性只是对对象中的单个属性进行监听,我么�
 # 实现
 
 ```javascript
+function Observer(data) {
+            this.data = data;
+            this.event = {};
+            this.walk(this.data);
+        }
+
+        var pt = Observer.prototype;
+
+        pt.$on = function(key, fn){
+            var t = this;
+
+            if(!t.event[key]){
+                t.event[key] = [fn];
+            } else {
+                t.event[key].push(fn);
+            }
+        }
+
+        pt.$emit = function(key, newVal, oldVal){
+            var t = this;
+            // 触发冒泡
+            var attrs = key.split('.');
+            var keys = [];
+
+            attrs.forEach(function(itemAttr, index){
+                keys.unshift( attrs.slice(0,index+1).join('.') );
+            })
+
+            keys.forEach( function (attr) {
+                if(!t.event[attr]){
+                    return;
+                }
+                t.event[attr].forEach(function (fn) {
+                    // 注意this指向，不加call指向window
+                    fn.call(t, newVal, oldVal);
+                })
+            } )
+        }
+
+        pt.walk = function(data, parent){
+            var t = this;
+            // 父级
+            var newParent = parent ? parent : '';
+            for(var attr in data){
+                // 当前对象路径
+                var path = newParent ? newParent +  '.' + attr : attr;
+                if(typeof data[attr] == 'object'){
+                    t.walk(data[attr], path);
+                }
+                t.convert(data, attr, path);
+            }
+        }
+        
+        pt.$watch = function (key, fn) {
+            this.$on(key, fn)
+        }
+
+        pt.convert = function(data, attr, path){
+            var t = this;
+            var value = data[attr];
+
+            Object.defineProperty(data, attr, {
+                enumerable: true,
+                configurable: true,
+                get: function(){
+                    console.log(`读取了${attr},值为${value}`);
+                    return value;
+                },
+                set: function(val){
+                    if(val !== value){
+                        // 触发属性的watch函数，在value赋值之前触发
+                        console.log(path, 'path');
+                        t.$emit(path, val, value);
+
+                        value = val;
+                        if(typeof val === 'object'){
+                            t.walk(val);
+                        }
+                        console.log(`设置了${attr},值为${value}`);
+                    }
+                }
+            })
+        }
+
+        let app1 = new Observer({
+            name: 'youngwind',
+            age: 25,
+            list: {
+                haha: 'oh',
+                lala: 'ff',
+                dist: {
+                    xixi: 123456
+                }
+            }
+        });
+
+        app1.$watch('list', function(newVal,oldVal){
+            console.log(this);
+            console.log(newVal, oldVal)
+            console.log('list中的值变了');
+        });
+```
+
+<!-- ```javascript
 function Observer(obj){
     this.data = obj;
     this.walk(obj);
@@ -212,4 +316,4 @@ function Observer(obj){
         app1.$watch('list.haha', function(age) {
             console.log(`list.haha变了,值为${age}`);
         });
-```
+``` -->
