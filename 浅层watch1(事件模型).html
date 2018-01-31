@@ -18,7 +18,8 @@
 
         var pt = Observer.prototype;
 
-        pt.$on = function(key, fn) {
+        // 绑定事件
+        pt.$listen = function(key, fn) {
             var t = this;
 
             if (!t.event[key]) {
@@ -28,12 +29,33 @@
             }
         }
 
-        pt.$emit = function(key, newVal, oldVal) {
+        // 触发事件
+        pt.$notify = function(key, newVal, oldVal) {
             var t = this;
             t.event[key].forEach(function(fn) {
                 // 注意this指向，不加call指向window
                 fn.call(t, newVal, oldVal);
             })
+        }
+
+        // 移除事件
+        pt.$remove = function(key, fn) {
+            var t = this;
+
+            // 没有该属性
+            if(!t.event[key]){
+                return;
+            }
+
+            if(!fn){
+                delete t.event[key];
+            }else{
+                t.event[key].forEach( (fnItem, index) => {
+                    if(fnItem === fn){
+                        t.event[key].splice(index, 1);
+                    }
+                } )
+            }
         }
 
         pt.walk = function(data, parent) {
@@ -52,7 +74,15 @@
 
 
         pt.$watch = function(key, fn) {
-            this.$on(key, fn)
+            const t = this;
+
+            // 绑定监听的事件
+            t.$listen(key, fn);
+
+            return function(){
+                // 删除事件
+                t.$remove(key, fn);
+            }
         }
 
         pt.convert = function(data, attr, path) {
@@ -63,20 +93,19 @@
                 enumerable: true,
                 configurable: true,
                 get: function() {
-                    console.log(`读取了${attr},值为${value}`);
+                    // console.log(`读取了${attr},值为${value}`);
                     return value;
                 },
                 set: function(val) {
                     if (val !== value) {
                         // 触发属性的watch函数，在value赋值之前触发
-                        console.log(path, 'path');
-                        t.$emit(path, val, value);
+                        t.$notify(path, val, value);
 
                         value = val;
                         if (typeof val === 'object') {
                             t.walk(val);
                         }
-                        console.log(`设置了${attr},值为${value}`);
+                        // console.log(`设置了${attr},值为${value}`);
                     }
                 }
             })
@@ -94,9 +123,10 @@
             }
         });
 
-        app1.$watch('list.haha', function(newVal, oldVal) {
-            console.log(this);
-            console.log(newVal, oldVal);
+        // 返回取消监听函数
+        var unwatch = app1.$watch('list.haha', function(newVal, oldVal) {
+            // console.log(this);
+            // console.log(newVal, oldVal);
             console.log('list.haha中的值变了');
         });
     </script>

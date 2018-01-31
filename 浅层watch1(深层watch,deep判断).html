@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /* event start */
+        function Dep(vm){
+            this.event = {};
+            this.vm = vm;
+        }
+
+        let depProto = Dep.prototype;
+
+        depProto.listen = function(key, fn) {
+            var t = this;
+
+            if (!t.event[key]) {
+                t.event[key] = [fn];
+            } else {
+                t.event[key].push(fn);
+            }
+        }
+
+        // 绑定事件
+        depProto.listen = function(key, fn) {
+            var t = this;
+
+            if (!t.event[key]) {
+                t.event[key] = [fn];
+            } else {
+                t.event[key].push(fn);
+            }
+        }
+
+        // 触发事件
+        depProto.notify = function(key, newVal, oldVal) {
+            var t = this;
+            // 触发冒泡
+            var attrs = key.split('.');
+            var keys = [];
+
+            attrs.forEach(function(itemAttr, index){
+                keys.unshift( attrs.slice(0,index+1).join('.') );
+            })
+
+            keys.forEach( function (attr) {
+                if(!t.event[attr]){
+                    return;
+                }
+                t.event[attr].forEach(function (fn) {
+                    // 注意this指向，不加call指向window
+                    fn.call(t.vm, newVal, oldVal);
+                })
+            } )
+        }
+
+        // 移除事件
+        depProto.remove = function(key, fn) {
+            var t = this;
+
+            // 没有该属性
+            if(!t.event[key]){
+                return;
+            }
+
+            if(!fn){
+                delete t.event[key];
+            }else{
+                var index = t.event[key].indexOf(fn);
+                if(index !== -1){
+                    t.event[key].splice(index, 1);
+                }
+            }
+        }
+
+        /* event end */
+
+
+        /* Observer start */
+        function Observer(data) {
+            this.data = data;
+            this.dep = new Dep(this);
+            this.walk(this.data);
+        }
+
+        var pt = Observer.prototype;
+
+
+        pt.walk = function(data, parent) {
+            var t = this;
+            // 父级
+            var newParent = parent ? parent : '';
+            for (var attr in data) {
+                // 当前对象路径
+                var path = newParent ? newParent + '.' + attr : attr;
+                if (typeof data[attr] == 'object') {
+                    t.walk(data[attr], path);
+                }
+                t.convert(data, attr, path);
+            }
+        }
+
+
+        pt.$watch = function(key, fn) {
+            const t = this;
+
+            // 绑定监听的事件
+            t.dep.listen(key, fn);
+
+            return function(){
+                // 删除事件
+                t.dep.remove(key, fn);
+            }
+        }
+
+        pt.convert = function(data, attr, path) {
+            var t = this;
+            var value = data[attr];
+
+            Object.defineProperty(data, attr, {
+                enumerable: true,
+                configurable: true,
+                get: function() {
+                    return value;
+                },
+                set: function(val) {
+                    if (val === value) {
+                        return;
+                    }
+
+                    // 触发属性的watch函数，在value赋值之前触发
+                    t.dep.notify(path, val, value);
+
+                    value = val;
+                    if (typeof val === 'object') {
+                        t.walk(val);
+                    }
+                }
+            })
+        }
+
+        let app1 = new Observer({
+            name: 'youngwind',
+            age: 25,
+            list: {
+                haha: 'oh',
+                lala: 'ff',
+                dist: {
+                    xixi: 123456
+                }
+            }
+        });
+
+        // 监听函数
+        app1.$watch('list.haha', function(newVal, oldVal) {
+            console.log('list.haha中的值变了');
+        });
+        app1.$watch('list', function(newVal, oldVal) {
+            console.log('list中的值变了');
+        },false);
+    </script>
+</body>
+
+</html>

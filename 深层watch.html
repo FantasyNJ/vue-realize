@@ -80,21 +80,21 @@
                 enumerable: true,
                 configurable: true,
                 get: function(){
-                    console.log(`读取了${attr},值为${value}`);
+                    // console.log(`读取了${attr},值为${value}`);
                     return value;
                 },
                 set: function(val){
                     // 值改变时才触发重新赋值
                     if(val !== value){
                         // 触发属性的watch函数，在value赋值之前触发
-                        console.log(path, 'path');
+                        // console.log(path, 'path');
                         t.$emit(path, val, value);
 
                         value = val;
                         if(typeof val === 'object'){
                             t.walk(val);
                         }
-                        console.log(`设置了${attr},值为${value}`);
+                        // console.log(`设置了${attr},值为${value}`);
                     }
                 }
             })

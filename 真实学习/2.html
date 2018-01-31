@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    class Vue {
+        constructor (options) {
+            this.$options = options;
+            this._data = this.$options.data;
+            var self = this;
+            // 数据劫持(代理) vm.data.属性名称 => vm.属性名称 方便访问。数据挂载到this上
+            Object.keys(this.$options.data).forEach(key => {
+                this._proxy(key);
+            });
+            //监听数据，给数据添加dep主题对象，在数据改变时通知订阅了该属性的watcher
+            observer(this._data);
+        }
+
+        _proxy(key){
+            let self = this;
+
+            Object.defineProperty(self, key, {
+                enumerable: true,
+                configurable: true,
+                get(){
+                    return self._data[key];
+                },
+                set(value){
+                    self._data[key] = value;
+                }
+            })
+        }
+    }
+
+    class Observer {
+        // data经过observer函数的过滤一定为Object
+        constructor(data){
+            // 在data上挂载__ob__属性，第四个参数为空不能被遍历（防止walk时被遍历出来加上被加上...）
+            def(data, '__ob__', this);
+            this.value = data;
+            // this.dep = new Dep();
+            this.walk(this.value);
+        }
+
+        walk(data){
+            // 遍历对象的值
+            Object.keys(data).forEach( (key) => {
+                // 递归，判断data[key]是否为对象，若为对象继续遍历属性
+                var chlidObserver = observer(data[key]);
+                let value = data[key];
+                Object.defineProperty(data, key, {
+                    enumerable: true,
+                    configurable: true,
+                    get(){
+                        return value;
+                    },
+                    set(newVal){
+                        // 值没有改变不触发
+                        if(newVal === value){
+                            return;
+                        }
+
+                        // 新值若为对象遍历属性
+                        if(typeof newVal === 'object'){
+                            observer(newVal);
+                        }
+
+                        value = newVal;
+                    }
+                } );
+            } )
+        }
+    }
+
+    // data必须为对象
+    function observer(data){
+        if(typeof data !== 'object'){
+            return;
+        }
+        return new Observer(data);
+    }
+
+    let app = new Vue({
+        data: {
+            haha: 123456,
+            list: {
+                name: '1234',
+                sex: '男',
+                xixi: {
+                    ka: 11
+                }
+            }
+        }
+    })
+
+
+    // 公共函数
+    function def(data, key, value, enumerable){
+        Object.defineProperty(data, key, {
+            value,
+            writable: true,
+            configurable: true,
+            enumerable: !!enumerable
+        })
+    }
+</script>
+</body>
+</html>

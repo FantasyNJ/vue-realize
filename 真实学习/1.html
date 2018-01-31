@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    class Vue {
+        constructor (options) {
+            this.$options = options;
+            this._data = this.$options.data;
+            var self = this;
+            // 数据劫持(代理) vm.data.属性名称 => vm.属性名称 方便访问。数据挂载到this上
+            Object.keys(this.$options.data).forEach(key => {
+                this._proxy(key);
+            });
+            //监听数据，给数据添加dep主题对象，在数据改变时通知订阅了该属性的watcher
+            observer(this._data);
+        }
+
+        _proxy(key){
+            let self = this;
+
+            Object.defineProperty(self, key, {
+                enumerable: true,
+                configurable: true,
+                get(){
+                    return self._data[key];
+                },
+                set(value){
+                    self._data[key] = value;
+                }
+            })
+        }
+    }
+</script>
+</body>
+</html>
