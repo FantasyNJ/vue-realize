@@ -22,16 +22,16 @@
 
         _proxy(key){
             let self = this;
+            let val = self._data[key];
 
             Object.defineProperty(self, key, {
                 enumerable: true,
                 configurable: false,
                 get(){
-                    console.log(self._data[key]);
-                    return self._data[key];
+                    return val;
                 },
                 set(value){
-                    self._data[key] = value;
+                    val = value;
                 }
             })
         }
@@ -57,7 +57,6 @@
                     enumerable: true,
                     configurable: false,
                     get(){
-                        console.log(value);
                         return value;
                     },
                     set(newVal){

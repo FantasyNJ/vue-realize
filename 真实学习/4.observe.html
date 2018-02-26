@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    let uid = 0;
+
+    class Mvvm {
+        constructor (options) {
+            // 实例的唯一标示
+            this._uid = uid++;
+
+            this.$options = options;
+            this._data = this.$options.data;
+            var self = this;
+            // 数据劫持(代理) vm.data.属性名称 => vm.属性名称 方便访问。数据挂载到this上
+            Object.keys(this.$options.data).forEach(key => {
+                this._proxy(key);
+            });
+            //监听数据，给数据添加dep主题对象，在数据改变时通知订阅了该属性的watcher
+            observe(this._data);
+        }
+    }
+
+    // data必须为对象
+    function observe(data){
+        if (!isObject(data)) {
+            return
+        }
+        return new Observer(data);
+    }
+
+
+    class Observer {
+        // data经过observe函数的过滤一定为Object
+        constructor(data){
+            // 在data上挂载__ob__属性，第四个参数为空不能被遍历（防止walk时被遍历出来加上被加上...）
+            def(data, '__ob__', this);
+            this.value = data;
+            // this.dep = new Dep();
+            this.walk(this.value);
+        }
+
+        walk(obj){
+            const val = this.value;
+            for (const key in obj) {
+                // 对象 key value
+                defineReactive(val, key, obj[key])
+            }
+        }
+
+        // walk(data){
+        //     // 遍历对象的值
+        //     Object.keys(data).forEach( (key) => {
+        //         // 递归，判断data[key]是否为对象，若为对象继续遍历属性
+        //         var chlidObserver = observe(data[key]);
+        //         let value = data[key];
+        //         Object.defineProperty(data, key, {
+        //             enumerable: true,
+        //             configurable: false,
+        //             get(){
+        //                 return value;
+        //             },
+        //             set(newVal){
+        //                 // 值没有改变不触发
+        //                 if(newVal === value){
+        //                     return;
+        //                 }
+        //
+        //                 // 新值若为对象遍历属性
+        //                 if(typeof newVal === 'object'){
+        //                     observe(newVal);
+        //                 }
+        //
+        //                 value = newVal;
+        //             }
+        //         } );
+        //     } )
+        // }
+    }
+
+    // 绑定监听
+    function defineReactive (obj, key, val) {
+        // 获取当前key的defineProperty属性
+        const property = Object.getOwnPropertyDescriptor(obj, key);
+        // 如果property存在并且不可设置，不往后执行
+        if (property && property.configurable === false) {
+            return;
+        }
+
+        // ?????
+        let childOb = observe(val);
+
+        const getter = property && property.get
+        const setter = property && property.set
+
+        Object.defineProperty({
+            enumerable: true,
+            configurable: false,
+            get(){
+                const value = getter ? getter.call(obj) : val
+
+                return value;
+            },
+            set(newVal){
+                // 有getter取getter的val值（不清楚getter中海油没有必须触发的逻辑）
+                const value = getter ? getter.call(obj) : val;
+
+                // 新值与旧值不同，不重新赋值
+                if(newVal === value){
+                    return;
+                }
+
+                // ??????
+                if (setter) {
+                    setter.call(obj, newVal)
+                } else {
+                    val = newVal;
+                }
+
+                childOb = observe(newVal)
+            }
+        })
+    }
+
+
+    let app = new Mvvm({
+        data: {
+            haha: 123456,
+            list: {
+                name: '1234',
+                sex: '男',
+                xixi: {
+                    ka: 11
+                }
+            }
+        }
+    })
+
+
+    // 公共函数
+    function def(data, key, value, enumerable){
+        Object.defineProperty(data, key, {
+            value,
+            writable: true,
+            configurable: true,
+            enumerable: !!enumerable
+        })
+    }
+
+
+    /* 公共方法 */
+    function isObject(obj) {
+        return obj !== null && typeof obj === 'object';
+    }
+    /*  */
+</script>
+</body>
+</html>
