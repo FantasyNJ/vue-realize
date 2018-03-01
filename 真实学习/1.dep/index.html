@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script type="module">
+    import observe from './observe'
+
+    function Vue(options) {
+        this.$options = options;
+        this._init();
+    }
+
+    // 初始化状态
+    initState(Vue)
+
+    function initState(Vue){
+        Vue.prototype._init = function () {
+            // vm => 实例化对象
+            const vm = this;
+            // 初始化数据
+            initData(vm)
+        }
+    }
+    
+    function initData(vm) {
+        let data = vm.$options.data;
+
+        // 1. 区分data是object还是函数（ data(){this.a=1} ）, 如果没有data属性则置为{}
+        vm._data = typeof data === 'function' ? data.call(vm) : data || {} ;
+
+        // 2. 遍历data中的数据并挂载到Vue实例化对象上以便直接使用this调用
+        const keys = Object.keys(data);
+
+        for(let i = 0; i < keys.length; i++){
+            let key = keys[i];
+            proxy(vm, key);
+        }
+
+        // 监听数据，observe的data只能为obj或arr（初始的data为obj，然后observe内部会循环遍历每一个值）
+        observe(data);
+    }
+
+    // 监听绑在this的data
+    function proxy(vm, key){
+        Object.defineProperty(vm, key, {
+            enumerable: true,
+            configurable: true,
+            get(){
+                return vm._data[key];
+            },
+            set(newVal){
+                vm._data[key] = newVal;
+            }
+        })
+    }
+
+    window.app = new Vue({
+        data: {
+            haha: 123456,
+            list: {
+                name: '1234',
+                sex: '男',
+                xixi: {
+                    ka: 11
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>

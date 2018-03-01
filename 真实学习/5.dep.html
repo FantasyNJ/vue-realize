@@ -68,7 +68,7 @@
             return;
         }
 
-        // ?????
+        // ?????  继续循环遍历监听对象中的值（值必须为对象）
         let childOb = observe(val);
 
         const getter = property && property.get;
@@ -112,7 +112,7 @@
     let depId = 0;
 
     class Dep{
-        static target;
+        // static target;
 
         constructor(){
             // Dep的id
@@ -138,13 +138,13 @@
         }
 
         // 通知
-        notify () {
-            // stablize the subscriber list first
-            const subs = this.subs.slice()
-            for (let i = 0, l = subs.length; i < l; i++) {
-                subs[i].update()
-            }
-        }
+        // notify () {
+        //     // stablize the subscriber list first
+        //     const subs = this.subs.slice()
+        //     for (let i = 0, l = subs.length; i < l; i++) {
+        //         subs[i].update()
+        //     }
+        // }
 
     }
 
