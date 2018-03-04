@@ -1,12 +1,18 @@
 import { isObject, def } from './common.js'
+import Dep from './dep.js'
 
+// Observe中的value只可能是obj或arr
 class Observe {
     constructor(value){
         // 当前遍历的obj或arr
         this.value = value;
         this._vmCount = 0;
 
-        // ?????, 不可被遍历
+        //??? dep记录了和这个value值的相关依赖
+        this.dep = new Dep()
+        console.log(value, this.dep.id)
+
+        // ?????, 不可被遍历,value其实就是vm._data, 即在vm._data上添加__ob__属性
         def(value, '__ob__', this);
 
         // 只遍历obj，arr的逻辑不写
@@ -37,6 +43,9 @@ function observe(val) {
 
 //
 function defineReactive(obj, key, val) {
+
+    //??? 每个属性新建一个dep实例，管理这个属性的依赖
+    const dep = new Dep()
 
 
     // 检查defineProperty的属性值
@@ -69,6 +78,9 @@ function defineReactive(obj, key, val) {
 
             // 重新赋值
             val = newVal;
+
+            // 如果新的值为obj或arr（observe中有判断），对得到的新值进行observe
+            childOb = observe(newVal)
         }
     })
 }
