@@ -18,3 +18,8 @@ export const remove = (arr, item) => {
     let index = arr.indexOf(item);
     arr.splice(index, 1);
 }
+
+// 判断是不是obj
+export function isPlainObject (obj) {
+    return Object.prototype.toString.call(obj) === '[object Object]'
+}

@@ -8,6 +8,8 @@
 
 <script type="module">
     import observe from './observe.js'
+    import { isPlainObject } from './common'
+    import Watcher from './watch'
 
     function Vue(options) {
         this.$options = options;
@@ -17,15 +19,19 @@
     // 初始化状态
     initState(Vue)
 
+
     function initState(Vue){
         Vue.prototype._init = function () {
             // vm => 实例化对象
             const vm = this;
             // 初始化数据
             initData(vm)
+            // 初始化watch
+            initWatch(vm)
         }
     }
-    
+
+    // 初始化数据函数
     function initData(vm) {
         let data = vm.$options.data;
 
@@ -42,6 +48,52 @@
 
         // 监听数据，observe的data只能为obj或arr（初始的data为obj，然后observe内部会循环遍历每一个值）
         observe(data);
+    }
+
+    // 初始化watch函数
+    function initWatch(vm){
+        const watch = vm.$options.watch;
+
+        // 如果watch存在
+        if(watch){
+            for(const key in watch){
+                const handler = watch[key];
+                // ???  还能是数组？文档中没写，带之后确认。。。。。
+                if (Array.isArray(handler)) {
+                    for (let i = 0; i < handler.length; i++) {
+                        createWatcher(vm, key, handler[i])
+                    }
+                } else {
+                    createWatcher(vm, key, handler)
+                }
+            }
+        }
+    }
+
+    // 创建watcher
+    function createWatcher(vm, key, handler){
+        let options
+        // 如果为obj,证明结构为{handler: xxx,deep: xxx}
+        if( isPlainObject(handler) ){
+            options = handler
+            // handler变成回调函数
+            handler = handler.handler
+        }
+        // 如果handler为string，则就是为方法名，handler = vm的methods中的函数
+        if (typeof handler === 'string') {
+            handler = vm[handler]
+        }
+        // 调用$watch
+        vm.$watch(key, handler, options)
+    }
+
+    // $watch函数挂载到Vue对象
+    Vue.prototype.$watch = function(expOrFn, cb, options){
+        const vm = this;
+        // 选项
+        options = options || {};
+
+        const watcher = new Watcher(vm, expOrFn, cb, options)
     }
 
     // 监听绑在this的data

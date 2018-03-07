@@ -23,6 +23,15 @@
                         xixi: 123456
                     }
                 }
+            },
+            watch: {
+                'list': {
+                    // watch 中不用改使用箭头函数
+                    handler: function(newVal, oldVal){
+                        console.log(newVal, oldVal, 1234567)
+                    },
+                    deep: true
+                }
             }
         })
     </script>
