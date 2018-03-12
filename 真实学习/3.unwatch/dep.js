@@ -19,6 +19,7 @@ export default class Dep {
     // 检查当前Dep.target是否存在以及判断这个watcher已经被添加到了相应的依赖当中，如果没有则添加订阅者(依赖)，如果已经被添加了那么就不做处理
     depend () {
         if (Dep.target) {
+            // 这一步是dep和watch建立联系的关键
             Dep.target.addDep(this)
         }
     }

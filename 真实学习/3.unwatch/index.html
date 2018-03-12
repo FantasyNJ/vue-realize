@@ -102,7 +102,9 @@
 
         const watcher = new Watcher(vm, expOrFn, cb, options)
 
-
+        return function unwatchFn(){
+            watcher.teardown();
+        }
     }
 
     // 监听绑在this的data
@@ -131,10 +133,14 @@
             }
         },
         watch: {
-            haha(){
-                console.log('haha变了');
+            list(val, newVal){
+                console.log('list变了', val, newVal);
             }
         }
+    })
+
+    window.unwatch = app.$watch('list.xixi.ka', (newVal, oldVal) => {
+        console.log(newVal, oldVal)
     })
 </script>
 </body>

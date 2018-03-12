@@ -66,7 +66,7 @@ function defineReactive(obj, key, val) {
         get(){
             // 该属性存在watch监听, 添加watch实例化对象
             if( Dep.target ){
-                dep.addSub( Dep.target );
+                dep.depend();
             }
             // 在第一次监听数据是get和set都是undefined，不用担心getter.call之后陷入死循环
             const value = getter ? getter.call(obj) : val;

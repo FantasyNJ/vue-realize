@@ -64,9 +64,14 @@ function defineReactive(obj, key, val) {
         enumerable: true,
         configurable: true,   // alpha版本是false，正式版变为true了，不知是处于什么考虑？？？？
         get(){
-            // 该属性存在watch监听, 添加watch实例化对象
+            // 该属性存在watch监听, 添加watch实例化对象。get()执行完后Dep.target变为null
             if( Dep.target ){
-                dep.addSub( Dep.target );
+                dep.depend();
+
+                // 如果值为对象或数组（observe已经判断），则在子observe中添加父级的watch
+                if(childOb){
+                    childOb.dep.depend();
+                }
             }
             // 在第一次监听数据是get和set都是undefined，不用担心getter.call之后陷入死循环
             const value = getter ? getter.call(obj) : val;

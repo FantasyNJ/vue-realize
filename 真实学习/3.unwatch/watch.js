@@ -22,6 +22,10 @@ export default class Watcher {
             this.deep = false;
         }
 
+        // 存储当前watch已经建立联系的dep
+        this.deps = []
+        this.depIds = []
+
         // 返回fn
         this.getter = parsePath(expOrFn)
 
@@ -43,20 +47,32 @@ export default class Watcher {
         const  value = this.get()
         // 当值改变时
         if(value !== this.value){
-            // 更新value
+            // 旧值
+            const oldVal = this.value
+            // 更新value，如果是对象原先指针已经断了
             this.value = value
             // 触发watch回调函数
-            this.cb.call(this.vm)
+            this.cb.call(this.vm, value, oldVal)
         }
     }
+    // 存储与watch建立联系的dep
+    /* 此处为自己实现 */
     addDep (dep) {
         const id = dep.id
-        if (!this.newDepIds.has(id)) {
-            this.newDepIds.add(id)
-            this.newDeps.push(dep)
-            if (!this.depIds.has(id)) {
-                dep.addSub(this)
-            }
+        // 当前dep没有与watch建立联系
+        if( !this.depIds.includes(id) ){
+            this.depIds.push(id)
+            this.deps.push(dep)
+            // dep中存储当前watch
+            dep.addSub(this)
+        }
+    }
+    // 取消dep与本watch实例的关联（unwatch）
+    teardown(){
+        // 遍历当前watch建立联系的dep，删除本watch
+        let i = this.deps.length
+        while (i--) {
+            this.deps[i].removeSub(this)
         }
     }
 }
