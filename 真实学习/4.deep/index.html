@@ -132,16 +132,20 @@
                 }
             }
         },
-        watch: {
-            list(val, newVal){
-                console.log('list变了', val, newVal);
-            }
-        }
+        // watch: {
+        //     list: {
+        //         handler(newVal, oldVal){
+        //             console.log('list')
+        //         },
+        //         deep: true,
+        //         immediate: true
+        //     }
+        // }
     })
 
-    window.unwatch = app.$watch('list.xixi.ka', (newVal, oldVal) => {
-        console.log(newVal, oldVal)
-    })
+    // window.unwatch = app.$watch('list.xixi.ka', (newVal, oldVal) => {
+    //     console.log('list.xixi.ka')
+    // }, {deep: true})
 </script>
 </body>
 </html>

@@ -25,7 +25,6 @@ export function isPlainObject (obj) {
 }
 
 // watch中解析路径
-
 // 非数字字母 . $ 符号
 const bailRE = /[^\w\.]/
 export function parsePath (path) {

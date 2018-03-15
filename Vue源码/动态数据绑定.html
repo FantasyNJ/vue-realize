@@ -28,11 +28,15 @@
                 'list': {
                     // watch 中不用改使用箭头函数
                     handler: function(newVal, oldVal){
-                        console.log(newVal, oldVal, 1234567)
+                        console.log('list')
                     },
                     deep: true
                 }
             }
+        })
+
+        vm.$watch('list.xixi.ka', (newVal, oldVal) => {
+            console.log('list.xixi.ka')
         })
     </script>
 </body>
