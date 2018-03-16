@@ -53,8 +53,12 @@ export default class Watcher {
     run(){
         // 新值
         const value = this.get()
-        // 当值改变时
-        if(value !== this.value){
+        /*
+         1. 值改变时
+         2. 如果值是一个obj，旧值和新值指向的是同一个obj，所以value === this.value，这是就判断this.deep是否为true
+         3. 此处源码的判断条件(value !== this.value || isObject(value) || this.deep)还有isObject(value),不明白为什么要加判断是否为对象??????
+         */
+        if(value !== this.value || this.deep){
             // 旧值
             const oldVal = this.value
             // 更新value，如果是对象原先指针已经断了
@@ -71,7 +75,7 @@ export default class Watcher {
         if( !this.newDepIds.has(id) ){
             this.newDepIds.add(id)
             this.newDeps.push(dep)
-            // 如果depIds中不存在当前depId，dep添加当前watch
+            // 如果depIds中不存在当前depId，dep添加当前watch,防止重复添加
             if (!this.depIds.has(id)) {
                 dep.addSub(this)
             }
@@ -135,6 +139,7 @@ function traverse (val, seen) {
 
         let keys = Object.keys(val)
         let i = keys.length
+        // 递归，此处触发val[keys[i]]的get()方法，从而将当前watch绑定到val[keys[i]]的dep中
         while (i--) traverse(val[keys[i]], seen)
     }
 }

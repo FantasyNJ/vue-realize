@@ -132,15 +132,15 @@
                 }
             }
         },
-        // watch: {
-        //     list: {
-        //         handler(newVal, oldVal){
-        //             console.log('list')
-        //         },
-        //         deep: true,
-        //         immediate: true
-        //     }
-        // }
+        watch: {
+            list: {
+                handler(newVal, oldVal){
+                    console.log('list')
+                },
+                deep: true,
+                immediate: true
+            }
+        }
     })
 
     // window.unwatch = app.$watch('list.xixi.ka', (newVal, oldVal) => {
