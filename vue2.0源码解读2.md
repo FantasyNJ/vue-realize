@@ -1,17 +1,16 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+# Vue2.0源码之数据监听
 
-<script type="module">
-    import observe from './observe.js'
-    import { isPlainObject } from './common.js'
-    import Watcher from './watch.js'
+## Dep对象
 
-    function Vue(options) {
+每个被监听的属性都有唯一的Dep实例，被监听的属性与Dep实例是一对一的关系
+Dep实例中的subs存储着该属性如果发生改变时触发哪些属性的watch回调
+
+## Watcher对象
+
+Watcher实例中存储着哪些属性（不会重复）改变时会触发该实例中的回调
+
+```javascript
+function Vue(options) {
         this.$options = options;
         this._init();
     }
@@ -19,23 +18,22 @@
     // 初始化状态
     initState(Vue)
 
-
     function initState(Vue){
         Vue.prototype._init = function () {
             // vm => 实例化对象
             const vm = this;
             // 初始化数据
             initData(vm)
-            // 初始化watch
+
+            // watch数据
             initWatch(vm)
         }
     }
-
-    // 初始化数据函数
+    
     function initData(vm) {
         let data = vm.$options.data;
 
-        // 1. 区分data是object还是函数（ data(){this.a=1} ）, 如果没有data属性则置为{}
+        // 1. 区分data是object还是函数（ data(){ return{a:1} ）, 如果没有data属性则置为{}
         vm._data = typeof data === 'function' ? data.call(vm) : data || {} ;
 
         // 2. 遍历data中的数据并挂载到Vue实例化对象上以便直接使用this调用
@@ -95,57 +93,68 @@
         // 选项
         options = options || {};
 
-        // 回调将会在侦听开始之后被立即调用
-        if( options.immediate ){
-            cb.call(vm);
-        }
-
         const watcher = new Watcher(vm, expOrFn, cb, options)
 
-        return function unwatchFn(){
-            watcher.teardown();
+    }
+```
+
+Watcher实例
+```javascript
+let uid = 0;
+
+// expOrFn先不考虑为fn的情况
+export default class Watcher {
+    constructor(vm, expOrFn, cb, options){
+        this.id = ++uid
+        // 指向传入的vue实例化对象
+        this.vm = vm;
+        // 回调函数
+        this.cb = cb;
+
+        // 返回fn
+        this.getter = parsePath(expOrFn)
+
+        // 当前的value值
+        this.value = this.get();
+    }
+    // 获取属性的值
+    get(){
+        // 关键点，Dep.target在此处设置为当前Watcher实例
+        Dep.target = this;
+        const value = this.getter(this.vm);
+        Dep.target = null;
+        return value;
+    }
+    update(){
+        this.run()
+    }
+    run(){
+        // 新值
+        const value = this.get()
+        /*
+         值改变时
+         */
+        if(value !== this.value ){
+            // 旧值
+            const oldVal = this.value
+            // 更新value，如果是对象原先指针已经断了
+            this.value = value
+            // 触发watch回调函数
+            this.cb.call(this.vm, value, oldVal)
         }
     }
-
-    // 监听绑在this的data
-    function proxy(vm, key){
-        Object.defineProperty(vm, key, {
-            enumerable: true,
-            configurable: true,
-            get(){
-                return vm._data[key];
-            },
-            set(newVal){
-                vm._data[key] = newVal;
-            }
-        })
-    }
-
-    window.app = new Vue({
-        data: {
-            haha: 123456,
-            list: {
-                name: '1234',
-                sex: '男',
-                xixi: {
-                    ka: 11
-                }
-            }
-        },
-        watch: {
-            list: {
-                handler(newVal, oldVal){
-                    console.log('list')
-                },
-                deep: true,
-                immediate: true
+    // 存储与watch建立联系的dep
+    addDep (dep) {
+        const id = dep.id
+        // newDepIds没有该属性的depId时，在newDepIds存储depId，newDeps存储dep
+        if( !this.newDepIds.has(id) ){
+            this.newDepIds.add(id)
+            this.newDeps.push(dep)
+            // 如果depIds中不存在当前depId，dep添加当前watch,防止重复添加
+            if (!this.depIds.has(id)) {
+                dep.addSub(this)
             }
         }
-    })
-
-    // window.unwatch = app.$watch('list.xixi.ka', (newVal, oldVal) => {
-    //     console.log('list.xixi.ka')
-    // }, {deep: true})
-</script>
-</body>
-</html>
+    }
+}
+```

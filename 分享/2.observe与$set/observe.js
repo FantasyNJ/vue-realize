@@ -75,12 +75,18 @@ export function defineReactive(obj, key, val) {
                 return;
             }
 
+            // 在此执行当值改变的时候执行watch的cb并且更新视图
+
             // 重新赋值
             val = newVal;
+
+            // 如果新的值为obj或arr（observe中有判断），对得到的新值进行observe
+            childOb = observe(newVal)
         }
     })
 }
 
+// $set
 export function set (obj, key, val) {
 
     // 如果key是存在的，触发obj[key]的set(),更新value
