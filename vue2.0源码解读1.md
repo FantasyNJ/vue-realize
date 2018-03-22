@@ -1,8 +1,105 @@
-import { isObject, def } from './common.js'
-import Dep from './dep.js'
+# Vue2.0之数据绑定
 
+## Vue源码学习前期知识
+
+1. Object.defineProperty
+2. es6基础知识
+3. flow.js
+4. webpack(vue2.0源码使用webpack构建)
+
+熟练掌握`Object.defineProperty`中的各个参数的含义
+
+#### 数据描述
+>value
+>writable
+
+#### 存取器描述
+>get
+>set
+
+#### 两者通用
+>configurable
+>enumerable
+
+> Object.defineProperty的详解可以参考一下这篇文章[http://blog.ayabala.com/?p=722]()
+
+## Vue的构造函数
+
+**问题一：我们是如何可以直接通过this.xxx来访问到data中的数据的？**
+
+```javascript
+// Vue的构造函数
+function Vue(options) {
+    this.$options = options;
+    this._init();
+}
+
+// 初始化状态
+initState(Vue)
+
+
+function initState(Vue){
+    Vue.prototype._init = function () {
+        // vm => 实例化对象
+        const vm = this;
+        // 初始化数据
+        initData(vm)
+    }
+}
+
+// 初始化数据函数
+function initData(vm) {
+    let data = vm.$options.data;
+
+    // 1. 区分data是object还是函数（ data(){ return{a:1} } ）, 如果没有data属性则置为{}
+    vm._data = typeof data === 'function' ? data.call(vm) : data || {} ;
+
+    // 2. 遍历data中的数据并挂载到Vue实例化对象上以便直接使用this调用
+    const keys = Object.keys(data);
+
+    for(let i = 0; i < keys.length; i++){
+        let key = keys[i];
+        proxy(vm, key);
+    }
+}
+
+// 监听绑在this的data
+function proxy(vm, key){
+    Object.defineProperty(vm, key, {
+        enumerable: true,
+        configurable: true,
+        get(){
+            return vm._data[key];
+        },
+        set(newVal){
+            vm._data[key] = newVal;
+        }
+    })
+}
+
+window.app = new Vue({
+    data: {
+        haha: 123456,
+        list: {
+            name: '1234',
+            sex: '男',
+            xixi: {
+                ka: 11
+            }
+        }
+    },
+})
+```
+
+上述例子中只是data中的第一层属性绑定在this上，而且只是实现了第一层的监听，Vue源码中使用Observe对象来实现data对象的深度监听
+
+## Observe对象
+
+**问题二：如何实现data中每个属性的监听**
+
+```javascript
 // Observe中的value只可能是obj或arr
-class Observer {
+class Observe {
     constructor(value){
         // 当前遍历的obj或arr
         this.value = value;
@@ -35,12 +132,12 @@ function observe(val) {
     }
 
     // 开始观察数据
-    let ob = new Observer(val);
+    let ob = new Observe(val);
 
     return ob;
 }
 
-//
+// 监听属性
 function defineReactive(obj, key, val) {
 
     //??? 每个属性新建一个dep实例，管理这个属性的依赖
@@ -95,5 +192,4 @@ function defineReactive(obj, key, val) {
         }
     })
 }
-
-export default observe;
+```

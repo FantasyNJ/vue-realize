@@ -8,7 +8,6 @@
 
 <script type="module">
 
-    // Vue的构造函数
     function Vue(options) {
         this.$options = options;
         this._init();
@@ -16,7 +15,6 @@
 
     // 初始化状态
     initState(Vue)
-
 
     function initState(Vue){
         Vue.prototype._init = function () {
@@ -26,12 +24,11 @@
             initData(vm)
         }
     }
-
-    // 初始化数据函数
+    
     function initData(vm) {
         let data = vm.$options.data;
 
-        // 1. 区分data是object还是函数（ data(){ return{a:1} } ）, 如果没有data属性则置为{}
+        // 1. 区分data是object还是函数（ data(){ return{a:1} ）, 如果没有data属性则置为{}
         vm._data = typeof data === 'function' ? data.call(vm) : data || {} ;
 
         // 2. 遍历data中的数据并挂载到Vue实例化对象上以便直接使用this调用
@@ -49,6 +46,7 @@
             enumerable: true,
             configurable: true,
             get(){
+                console.log('haha')
                 return vm._data[key];
             },
             set(newVal){
@@ -67,9 +65,8 @@
                     ka: 11
                 }
             }
-        },
+        }
     })
-
 </script>
 </body>
 </html>

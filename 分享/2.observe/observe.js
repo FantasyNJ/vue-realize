@@ -1,15 +1,9 @@
-import { isObject, def } from './common.js'
-import Dep from './dep.js'
+import { def, isObject, hasOwn } from './common.js'
 
-// Observe中的value只可能是obj或arr
-class Observer {
+export class Observer {
     constructor(value){
         // 当前遍历的obj或arr
         this.value = value;
-        this._vmCount = 0;
-
-        //??? dep记录了和这个value值的相关依赖
-        this.dep = new Dep()
 
         // ?????, 不可被遍历,value其实就是vm._data, 即在vm._data上添加__ob__属性
         def(value, '__ob__', this);
@@ -27,7 +21,7 @@ class Observer {
     }
 }
 
-function observe(val) {
+export function observe(val) {
 
     // 如果不是obj或arr不执行
     if( !isObject(val) ){
@@ -40,15 +34,14 @@ function observe(val) {
     return ob;
 }
 
-//
-function defineReactive(obj, key, val) {
+window.ss = defineReactive
 
-    //??? 每个属性新建一个dep实例，管理这个属性的依赖
-    const dep = new Dep()
-
+// 监听属性
+export function defineReactive(obj, key, val) {
 
     // 检查defineProperty的属性值
     const property = Object.getOwnPropertyDescriptor(obj, key)
+
     // 如果属性值的configurable为不可设置状态则阻止执行防止报错
     if (property && property.configurable === false) {
         return
@@ -58,27 +51,25 @@ function defineReactive(obj, key, val) {
     const getter = property && property.get;
     const setter = property && property.set;
 
+    // 向下监听(只监听obj和arr)
     var childOb = observe(val);
 
     Object.defineProperty(obj, key, {
         enumerable: true,
         configurable: true,   // alpha版本是false，正式版变为true了，不知是处于什么考虑？？？？
         get(){
-            // 该属性存在watch监听, 添加watch实例化对象。get()执行完后Dep.target变为null
-            if( Dep.target ){
-                dep.depend();
-
-                // 如果值为对象或数组（observe已经判断），则在子observe中添加父级的watch
-                if(childOb){
-                    childOb.dep.depend();
-                }
-            }
-            // 在第一次监听数据是get和set都是undefined，不用担心getter.call之后陷入死循环
+            // 在第一次监听数据是get和set都是undefined，getter !== 当前的get，所以不会陷入死循环
             const value = getter ? getter.call(obj) : val;
+
+            console.log('data')
+
             return val;
+
+            // 解开注释后会触发死循环
+            // return obj[key];
         },
         set(newVal){
-            const value = getter ? getter.call(obj) : val
+            const value = getter ? getter.call(obj) : val;
             // 指没有发生变化时不触发
             if(val === newVal){
                 return;
@@ -86,14 +77,29 @@ function defineReactive(obj, key, val) {
 
             // 重新赋值
             val = newVal;
-
-            // 如果新的值为obj或arr（observe中有判断），对得到的新值进行observe
-            childOb = observe(newVal)
-
-            // 值改变触发watch中的cb
-            dep.notify();
         }
     })
 }
 
-export default observe;
+export function set (obj, key, val) {
+
+    // 如果key是存在的，触发obj[key]的set(),更新value
+    if ( hasOwn(obj, key) ) {
+        obj[key] = val
+        return
+    }
+
+    // 如果key不存在
+    const ob = obj.__ob__
+
+    // 如果obj不是对象（简单数据类型），直接赋值，触发set
+    if (!ob) {
+        obj[key] = val
+        return
+    }
+
+    // 如果obj是对象并且key不存在, ob.value===obj
+    defineReactive(ob.value, key, val)
+
+    return val
+}

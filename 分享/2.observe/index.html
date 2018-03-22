@@ -7,8 +7,8 @@
 <body>
 
 <script type="module">
+    import {observe, set} from './observe.js'
 
-    // Vue的构造函数
     function Vue(options) {
         this.$options = options;
         this._init();
@@ -16,7 +16,6 @@
 
     // 初始化状态
     initState(Vue)
-
 
     function initState(Vue){
         Vue.prototype._init = function () {
@@ -26,12 +25,11 @@
             initData(vm)
         }
     }
-
-    // 初始化数据函数
+    
     function initData(vm) {
         let data = vm.$options.data;
 
-        // 1. 区分data是object还是函数（ data(){ return{a:1} } ）, 如果没有data属性则置为{}
+        // 1. 区分data是object还是函数（ data(){ return{a:1} ）, 如果没有data属性则置为{}
         vm._data = typeof data === 'function' ? data.call(vm) : data || {} ;
 
         // 2. 遍历data中的数据并挂载到Vue实例化对象上以便直接使用this调用
@@ -41,6 +39,9 @@
             let key = keys[i];
             proxy(vm, key);
         }
+
+        // 监听数据，observe的data只能为obj或arr（初始的data为obj，然后observe内部会循环遍历每一个值）
+        observe(data);
     }
 
     // 监听绑在this的data
@@ -49,13 +50,19 @@
             enumerable: true,
             configurable: true,
             get(){
+                console.log('haha')
+
+                // 触发了this._data[key]的get()
                 return vm._data[key];
             },
             set(newVal){
+                // 触发了this._data[key]的set()
                 vm._data[key] = newVal;
             }
         })
     }
+
+    Vue.prototype.$set = set;
 
     window.app = new Vue({
         data: {
@@ -67,9 +74,8 @@
                     ka: 11
                 }
             }
-        },
+        }
     })
-
 </script>
 </body>
 </html>
