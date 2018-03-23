@@ -102,6 +102,7 @@ Watcher实例
 ```javascript
 let uid = 0;
 
+// immediate不接收
 // expOrFn先不考虑为fn的情况
 export default class Watcher {
     constructor(vm, expOrFn, cb, options){
@@ -123,6 +124,7 @@ export default class Watcher {
         Dep.target = this;
         const value = this.getter(this.vm);
         Dep.target = null;
+        this.cleanupDeps();
         return value;
     }
     update(){
@@ -155,6 +157,27 @@ export default class Watcher {
                 dep.addSub(this)
             }
         }
+    }
+    // 清除newDepIds和newDeps
+    cleanupDeps() {
+        let i = this.deps.length
+        while (i--) {
+            const dep = this.deps[i]
+            // 新增加的dep中没有当前watch中已存储的dep，则在dep中删除当前watch
+            if (!this.newDepIds.has(dep.id)) {
+                dep.removeSub(this)
+            }
+        }
+        // 清空newDepIds newDeps
+        // newDepIds 赋给 depIds， newDeps 赋给 deps。这些值是数组，不能直接赋值并清除
+        let tmp = this.depIds
+        this.depIds = this.newDepIds
+        this.newDepIds = tmp
+        this.newDepIds.clear()
+        tmp = this.deps
+        this.deps = this.newDeps
+        this.newDeps = tmp
+        this.newDeps.length = 0
     }
 }
 ```
