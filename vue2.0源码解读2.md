@@ -5,10 +5,6 @@
 每个被监听的属性都有唯一的Dep实例，被监听的属性与Dep实例是一对一的关系
 Dep实例中的subs存储着该属性如果发生改变时触发哪些属性的watch回调
 
-## Watcher对象
-
-Watcher实例中存储着哪些属性（不会重复）改变时会触发该实例中的回调
-
 ```javascript
 function Vue(options) {
         this.$options = options;
@@ -98,7 +94,10 @@ function Vue(options) {
     }
 ```
 
-Watcher实例
+## Watcher对象
+
+Watcher实例中存储着哪些属性（不会重复）改变时会触发该实例中的回调
+
 ```javascript
 let uid = 0;
 
