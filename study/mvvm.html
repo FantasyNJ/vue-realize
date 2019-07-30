@@ -2,9 +2,33 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Title</title>
 </head>
 <body>
-$END$
+<div id="mvvm-app">
+    <p>{{huahua.a}}</p>
+</div>
+<script src="./js/observer.js"></script>
+<script src="./js/watcher.js"></script>
+<script src="./js/compile.js"></script>
+<script src="./js/mvvm.js"></script>
+<script>
+    let vm = new MVVM({
+        el: '#mvvm-app',
+        data: {
+            haha: 123,
+            xixi: {
+                lala: 456
+            },
+            huahua: {
+                a: 1,
+                b: {
+                    c: 3,
+                    d: 4
+                }
+            }
+        }
+    });
+</script>
 </body>
 </html>

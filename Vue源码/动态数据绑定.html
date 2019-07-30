@@ -7,37 +7,45 @@
     <title>Document</title>
 </head>
 <body>
-    <div id="app"></div>
+    <div id="app">
+        {{huahua.a}} 阿善动技嘉
+        <p>{{haha}}</p>
+        <div>123 <span>{{huahua.b.c}}</span></div>
+    </div>
 
     <script src="./vue.js"></script>
     <script>
-        var vm = new Vue({
+         vm = new Vue({
             el: '#app',
             data: {
-                name: 'youngwind',
-                age: 25,
-                list: {
-                    haha: 'oh',
-                    lala: 'ff',
-                    dist: {
-                        xixi: 123456
+                haha: 123,
+                xixi: {
+                    lala: 456
+                },
+                huahua: {
+                    a: 1,
+                    b: {
+                        c: 3,
+                        d: 4
                     }
                 }
             },
-            watch: {
-                'list': {
-                    // watch 中不用改使用箭头函数
-                    handler: function(newVal, oldVal){
-                        console.log('list')
-                    },
-                    deep: true
-                }
-            }
+            // watch: {
+            //     'list': {
+            //         // watch 中不用改使用箭头函数
+            //         handler: function(newVal, oldVal){
+            //             console.log('list')
+            //         },
+            //         deep: true
+            //     }
+            // }
         })
 
-        vm.$watch('list.xixi.ka', (newVal, oldVal) => {
-            console.log('list.xixi.ka')
-        })
+        // vm.$watch('list.xixi.ka', (newVal, oldVal) => {
+        //     console.log('list.xixi.ka')
+        // })
+
+        console.log(vm)
     </script>
 </body>
 </html>

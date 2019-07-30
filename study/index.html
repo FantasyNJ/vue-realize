@@ -2,9 +2,52 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Title</title>
 </head>
 <body>
-$END$
+<div id="haha">
+    {{huahua.a}} 阿善动技嘉
+    <p>{{haha}}</p>
+    <div>123 <span>{{huahua.b.c}}</span></div>
+</div>
+<script type="module">
+    import Vue from './vue/index.js'
+
+    window.vm = new Vue({
+        el: '#haha',
+        data: {
+            haha: 123,
+            xixi: {
+                lala: 456
+            },
+            huahua: {
+                a: 1,
+                b: {
+                    c: 3,
+                    d: 4
+                }
+            }
+        }
+    })
+
+    console.log(vm)
+</script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

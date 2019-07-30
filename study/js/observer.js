@@ -23,6 +23,7 @@ Observer.prototype = {
             enumerable: true, // 可枚举
             configurable: false, // 不能再define
             get: function() {
+                console.log(`读取${key}的值为${val}`)
                 if (Dep.target) {
                     dep.depend();
                 }
